@@ -48,6 +48,7 @@ impl Modify for SecurityAddon {
     paths(
         super::generic::status,
         super::generic::robots_txt,
+        super::generic::passkey_endpoints,
 
         super::oauth2::oauth2_image_get,
 

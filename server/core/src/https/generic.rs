@@ -65,3 +65,27 @@ pub async fn robots_txt() -> impl IntoResponse {
 pub async fn redirect_to_update_credentials() -> impl IntoResponse {
     Redirect::to(Urls::UpdateCredentials.as_ref())
 }
+
+#[derive(serde::Serialize, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
+struct WellKnownPasskeyEndpoints {
+    enroll: Option<String>,
+    manage: Option<String>,
+    prf_usage_details: Option<String>,
+}
+
+#[utoipa::path(
+    get,
+    path = Urls::WellKnownPasskeyEndpoints.as_ref(),
+    responses(
+        (status = 200, description = "Ok", content_type = APPLICATION_JSON, body=WellKnownPasskeyEndpoints),
+    ),
+    tag = "ui",
+)]
+pub async fn passkey_endpoints(State(state): State<ServerState>) -> impl IntoResponse {
+    Json(WellKnownPasskeyEndpoints {
+        enroll: None,
+        manage: Some(format!("{}ui/update_credentials", state.origin)),
+        prf_usage_details: None,
+    })
+}
