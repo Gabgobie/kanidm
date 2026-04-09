@@ -67,9 +67,9 @@ pub async fn redirect_to_update_credentials() -> impl IntoResponse {
     Redirect::to(Urls::UpdateCredentials.as_ref())
 }
 
+#[serde_with::skip_serializing_none]
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
-#[serde_with::skip_serializing_none]
 struct WellKnownPasskeyEndpoints {
     enroll: Option<Url>,
     manage: Option<Url>,
