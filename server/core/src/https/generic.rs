@@ -4,6 +4,7 @@ use axum::response::{IntoResponse, Redirect};
 use axum::{Extension, Json};
 use kanidmd_lib::prelude::APPLICATION_JSON;
 use kanidmd_lib::status::StatusRequestEvent;
+use url::Url;
 
 use super::middleware::KOpId;
 use super::views::constants::Urls;
@@ -66,26 +67,22 @@ pub async fn redirect_to_update_credentials() -> impl IntoResponse {
     Redirect::to(Urls::UpdateCredentials.as_ref())
 }
 
-#[derive(serde::Serialize, utoipa::ToSchema)]
+#[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
+#[serde_with::skip_serializing_none]
 struct WellKnownPasskeyEndpoints {
-    enroll: Option<String>,
-    manage: Option<String>,
-    prf_usage_details: Option<String>,
+    enroll: Option<Url>,
+    manage: Option<Url>,
+    prf_usage_details: Option<Url>,
 }
 
-#[utoipa::path(
-    get,
-    path = Urls::WellKnownPasskeyEndpoints.as_ref(),
-    responses(
-        (status = 200, description = "Ok", content_type = APPLICATION_JSON, body=WellKnownPasskeyEndpoints),
-    ),
-    tag = "ui",
-)]
 pub async fn passkey_endpoints(State(state): State<ServerState>) -> impl IntoResponse {
+    let mut manage = state.origin;
+    manage.set_path("/ui/update_credentials");
+
     Json(WellKnownPasskeyEndpoints {
         enroll: None,
-        manage: Some(format!("{}ui/update_credentials", state.origin)),
+        manage: Some(manage),
         prf_usage_details: None,
     })
 }
